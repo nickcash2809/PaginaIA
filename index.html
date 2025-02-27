@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoMarket - Venta de Automóviles</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+        }
+        
+        header {
+            background-color: #1a237e;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .filters {
+            background-color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        select, button {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        button {
+            background-color: #1a237e;
+            color: white;
+            cursor: pointer;
+            border: none;
+            padding: 0.5rem 1rem;
+        }
+        
+        button:hover {
+            background-color: #303f9f;
+        }
+        
+        .car-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .car-card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .car-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .car-image {
+            height: 200px;
+            width: 100%;
+            background-color: #eee;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .car-image img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        
+        .car-details {
+            padding: 1rem;
+        }
+        
+        .car-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .car-price {
+            color: #d32f2f;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        
+        .car-specs {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+        
+        .car-spec {
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+        
+        .car-spec i {
+            margin-right: 0.5rem;
+            color: #666;
+        }
+        
+        .view-details {
+            display: block;
+            background-color: #1a237e;
+            color: white;
+            text-align: center;
+            padding: 0.75rem;
+            margin-top: 1rem;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        
+        .view-details:hover {
+            background-color: #303f9f;
+        }
+        
+        @media (max-width: 768px) {
+            .car-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>AutoMarket</h1>
+        <p>Tu concesionario de confianza</p>
+    </header>
+    
+    <div class="container">
+        <div class="filters">
+            <h2>Filtrar vehículos</h2>
+            <div class="filter-group">
+                <select id="marca">
+                    <option value="">Todas las marcas</option>
+                    <option value="toyota">Toyota</option>
+                    <option value="honda">Honda</option>
+                    <option value="nissan">Nissan</option>
+                    <option value="ford">Ford</option>
+                    <option value="chevrolet">Chevrolet</option>
+                </select>
+                
+                <select id="tipo">
+                    <option value="">Todos los tipos</option>
+                    <option value="sedan">Sedán</option>
+                    <option value="suv">SUV</option>
+                    <option value="hatchback">Hatchback</option>
+                    <option value="pickup">Pickup</option>
+                </select>
+                
+                <select id="precio">
+                    <option value="">Cualquier precio</option>
+                    <option value="0-15000">Hasta $15,000</option>
+                    <option value="15000-25000">$15,000 - $25,000</option>
+                    <option value="25000-35000">$25,000 - $35,000</option>
+                    <option value="35000+">Más de $35,000</option>
+                </select>
+            </div>
+            <button id="aplicarFiltros">Aplicar Filtros</button>
+        </div>
+        
+        <div class="car-grid" id="carGrid">
+            <!-- Los autos se cargarán aquí con JavaScript -->
+        </div>
+    </div>
+    
+    <script>
+        // Datos de ejemplo de automóviles
+        const autos = [
+            {
+                id: 1,
+                marca: "Toyota",
+                modelo: "Corolla",
+                tipo: "sedan",
+                año: 2023,
+                precio: 22500,
+                kilometraje: 0,
+                motor: "1.8L",
+                potencia: "140 HP",
+                transmision: "Automática",
+                combustible: "Gasolina",
+                imagen: "/api/placeholder/300/200"
+            },
+            {
+                id: 2,
+                marca: "Honda",
+                modelo: "CR-V",
+                tipo: "suv",
+                año: 2022,
+                precio: 31200,
+                kilometraje: 15000,
+                motor: "2.0L",
+                potencia: "190 HP",
+                transmision: "CVT",
+                combustible: "Gasolina",
+                imagen: "/api/placeholder/300/200"
+            },
+            {
+                id: 3,
+                marca: "Nissan",
+                modelo: "Sentra",
+                tipo: "sedan",
+                año: 2023,
+                precio: 19800,
+                kilometraje: 0,
+                motor: "2.0L",
+                potencia: "149 HP",
+                transmision: "Automática",
+                combustible: "Gasolina",
+                imagen: "/api/placeholder/300/200"
+            },
+            {
+                id: 4,
+                marca: "Ford",
+                modelo: "Ranger",
+                tipo: "pickup",
+                año: 2022,
+                precio: 33750,
+                kilometraje: 8500,
+                motor: "2.3L",
+                potencia: "270 HP",
+                transmision: "Automática",
+                combustible: "Gasolina",
+                imagen: "/api/placeholder/300/200"
+            },
+            {
+                id: 5,
+                marca: "Chevrolet",
+                modelo: "Spark",
+                tipo: "hatchback",
+                año: 2023,
+                precio: 14500,
+                kilometraje: 0,
+                motor: "1.4L",
+                potencia: "98 HP",
+                transmision: "Manual",
+                combustible: "Gasolina",
+                imagen: "/api/placeholder/300/200"
+            },
+            {
+                id: 6,
+                marca: "Toyota",
+                modelo: "RAV4",
+                tipo: "suv",
+                año: 2022,
+                precio: 28900,
+                kilometraje: 12000,
+                motor: "2.5L",
+                potencia: "203 HP",
+                transmision: "Automática",
+                combustible: "Gasolina",
+                imagen: "/api/placeholder/300/200"
+            }
+        ];
+        
+        // Función para mostrar automóviles
+        function mostrarAutos(listaAutos) {
+            const carGrid = document.getElementById('carGrid');
+            carGrid.innerHTML = '';
+            
+            listaAutos.forEach(auto => {
+                const card = document.createElement('div');
+                card.className = 'car-card';
+                
+                card.innerHTML = `
+                    <div class="car-image">
+                        <img src="${auto.imagen}" alt="${auto.marca} ${auto.modelo}">
+                    </div>
+                    <div class="car-details">
+                        <div class="car-title">${auto.marca} ${auto.modelo} ${auto.año}</div>
+                        <div class="car-price">$${auto.precio.toLocaleString()}</div>
+                        <div class="car-specs">
+                            <div class="car-spec">
+                                <i>🚗</i> ${auto.tipo.charAt(0).toUpperCase() + auto.tipo.slice(1)}
+                            </div>
+                            <div class="car-spec">
+                                <i>⚙️</i> ${auto.transmision}
+                            </div>
+                            <div class="car-spec">
+                                <i>⛽</i> ${auto.combustible}
+                            </div>
+                            <div class="car-spec">
+                                <i>🔧</i> ${auto.motor}
+                            </div>
+                            <div class="car-spec">
+                                <i>🏎️</i> ${auto.potencia}
+                            </div>
+                            <div class="car-spec">
+                                <i>🛣️</i> ${auto.kilometraje.toLocaleString()} km
+                            </div>
+                        </div>
+                        <a href="#" class="view-details">Ver detalles</a>
+                    </div>
+                `;
+                
+                carGrid.appendChild(card);
+            });
+        }
+        
+        // Inicializar la página con todos los autos
+        document.addEventListener('DOMContentLoaded', () => {
+            mostrarAutos(autos);
+            
+            // Manejar la aplicación de filtros
+            document.getElementById('aplicarFiltros').addEventListener('click', () => {
+                const marcaSeleccionada = document.getElementById('marca').value.toLowerCase();
+                const tipoSeleccionado = document.getElementById('tipo').value.toLowerCase();
+                const precioSeleccionado = document.getElementById('precio').value;
+                
+                let autosFiltrados = autos;
+                
+                // Filtrar por marca
+                if (marcaSeleccionada) {
+                    autosFiltrados = autosFiltrados.filter(auto => 
+                        auto.marca.toLowerCase() === marcaSeleccionada
+                    );
+                }
+                
+                // Filtrar por tipo
+                if (tipoSeleccionado) {
+                    autosFiltrados = autosFiltrados.filter(auto => 
+                        auto.tipo === tipoSeleccionado
+                    );
+                }
+                
+                // Filtrar por precio
+                if (precioSeleccionado) {
+                    const [min, max] = precioSeleccionado.split('-');
+                    
+                    if (max) {
+                        autosFiltrados = autosFiltrados.filter(auto => 
+                            auto.precio >= parseInt(min) && auto.precio <= parseInt(max)
+                        );
+                    } else if (min === '35000+') {
+                        autosFiltrados = autosFiltrados.filter(auto => 
+                            auto.precio >= 35000
+                        );
+                    } else if (min === '0') {
+                        autosFiltrados = autosFiltrados.filter(auto => 
+                            auto.precio <= parseInt(max)
+                        );
+                    }
+                }
+                
+                mostrarAutos(autosFiltrados);
+            });
+        });
+    </script>
+</body>
+</html>
